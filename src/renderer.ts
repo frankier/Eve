@@ -221,9 +221,7 @@ export function renderRecords() {
         }
 
       } else if(attribute === "checked") {
-        if(value && value.length > 1) {
-          console.error("Unable to set 'checked' multiple times on entity", entity, value);
-        } else if(value && value[0]) {
+        if(value && value[0]) {
           elem.setAttribute("checked", "true");
           if (elem.getAttribute("type") == "radio") {
             var name = elem.getAttribute("name") || "";
