@@ -5,7 +5,7 @@
 import {PerformanceTracker, NoopPerformanceTracker} from "./performance";
 
 const TRACK_PERFORMANCE = true;
-const MAX_ROUNDS = 30;
+const MAX_ROUNDS = 300;
 
 //---------------------------------------------------------------------
 // Setups
@@ -226,16 +226,16 @@ export class Evaluation {
     changes.changed = true;
     while(changes.changed && changes.round < MAX_ROUNDS) {
       changes.nextRound();
-      // console.groupCollapsed("Round" + changes.round);
+      console.groupCollapsed("Round" + changes.round);
       for(let block of blocks) {
         let start = perf.time();
         block.execute(this.multiIndex, changes);
         perf.block(block.id, start);
       }
-      // console.log(changes);
+      console.log(changes);
       commit = changes.commit();
       blocks = this.blocksFromCommit(commit);
-      // console.groupEnd();
+      console.groupEnd();
     }
     if(changes.round >= MAX_ROUNDS) {
       this.error("Fixpoint Error", "Evaluation failed to fixpoint");

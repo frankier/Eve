@@ -142,16 +142,26 @@ export class SystemDatabase extends Database {
   memory: any;
 
   analyze(evaluation: Evaluation, db: Database) {
-    let time;
+    let new_time = null;
     let memory;
     for(let block of db.blocks) {
       for(let scan of block.parse.scanLike) {
         if(scan.type === "record") {
           for(let attribute of scan.attributes) {
             if(attribute.attribute === "tag" && attribute.value.value === "time") {
-              if(this.time) this.time.close();
-              time = this.time = new TimeAgent();
-              time.configure(scan);
+              new_time = new TimeAgent();
+              new_time.configure(scan);
+              if(this.time) {
+                // Keep the timer with the lowest interval
+                if(this.time.interval < new_time.interval) {
+                  new_time = null;
+                } else {
+                  this.time.close();
+                  this.time = new_time;
+                }
+              } else {
+                this.time = new_time;
+              }
             } else if(attribute.attribute === "tag" && attribute.value.value === "memory") {
               if(this.memory) this.memory.close();
               if(global["browser"]) {
@@ -165,8 +175,8 @@ export class SystemDatabase extends Database {
         }
       }
     }
-    if(time) {
-      time.setup(evaluation)
+    if(new_time) {
+      new_time.setup(evaluation)
     }
     if(memory) {
       memory.setup(evaluation);
